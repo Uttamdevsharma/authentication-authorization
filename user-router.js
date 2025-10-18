@@ -3,6 +3,7 @@ const User = require('./models/user.model');
 const { generateToken } = require('./services/token.service');
 const userRouter = express.Router()
 const moment = require('moment');
+const checkAuthentication = require('./middleware/check-auth');
 
 
 
@@ -92,7 +93,7 @@ userRouter.post("/login",async(req,res)=>{
 
 
 ///proFile route
-userRouter.get("/profile", async(req,res) => {
+userRouter.get("/profile", checkAuthentication, async(req,res) => {
    res.send({message:"private profile endpoint"})
 })
 
