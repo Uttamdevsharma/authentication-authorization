@@ -1,31 +1,42 @@
-const jwt  = require('jsonwebtoken')
-function checkAuthentication (req,res,next){
- const authHeader = req.headers.authorization
+const jwt = require('jsonwebtoken');
 
- if(!authHeader || !authHeader.startsWith("Baarer ")){
+function checkAuthentication(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  // ✅ "Bearer " spelling ঠিক করা হলো
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).send({
-        message: "Unauthorized"
+      message: "Unauthorized",
     });
- }
- 
- 
-const token = authHeader.split(" ")[1]
+  }
 
-try{
-   const decoded = jwt.verify(token, process.env.JWT_SECRET)
-   req.user = decoded;
-   next()
+  const token = authHeader.split(" ")[1];
 
-}catch(error){
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
     return res.status(401).send({
-        message:
+      message:
         process.env.NODE_ENV === "development"
-        ? error.message
-        : "Unauthorized",
-    })
-}
- 
+          ? error.message
+          : "Unauthorized",
+    });
+  }
 }
 
+function checkAuthorization(req, res, next) {
+  const { role } = req.user;
 
-module.exports = checkAuthentication
+  if (role === "admin") {
+    next();
+  } else {
+    res.status(401).send({ message: "Unauthorized" });
+  }
+}
+
+module.exports = {
+  checkAuthentication,
+  checkAuthorization,
+};
