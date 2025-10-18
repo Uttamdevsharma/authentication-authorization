@@ -41,6 +41,8 @@ userRouter.post("/register",async(req,res) =>{
    }
 })
 
+
+//login
 userRouter.post("/login",async(req,res)=>{
    const {email,password} = req.body
    try{
